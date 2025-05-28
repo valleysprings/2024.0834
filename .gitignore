@@ -165,7 +165,6 @@ cython_debug/
 .LSOverride
 
 # specific
-preprocess/*
 log/*
 baseline/*
 !baseline/non_learning.py
