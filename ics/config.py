@@ -17,10 +17,7 @@ def parse_args():
     parser.add_argument('--num_graphs', type=int, default=1,
                       help='Number of graphs to test (only for simulation)')
     parser.add_argument('--embedding', type=str, default='node2vec',
-                      choices=['node2vec', 'grarep', 'diff2vec', 'nodesketch'],
                       help='Type of embedding method to use')
-    parser.add_argument('--original', action='store_true',
-                      help='Whether to use the original embeddings, only for cora, citeseer, pubmed')
     parser.add_argument('--directed_using_undirected_embedding', action='store_true',
                       help='Whether to use the undirected embedding for directed graph, only for eu-core_directed')
     parser.add_argument('--directed_using_undirected_PPR', action='store_true',
