@@ -165,8 +165,6 @@ cython_debug/
 .LSOverride
 
 # specific
-dataset/*
-!dataset/amazon
 preprocess/*
 log/*
 baseline/*
