@@ -42,7 +42,7 @@ This code is tested under Python 3.10 (with conda) with following dependencies:
   ```
 - pyg-lib (used for generating Node2vec embedding)
   - If running with torch 1.12.0 with cuda 11.6 then simply run 
-  ```python
+  ```bash
   pip install pyg-lib -f https://data.pyg.org/whl/torch-1.12.0+cu116.html
   ```
 
