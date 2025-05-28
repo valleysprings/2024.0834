@@ -132,7 +132,7 @@ def label_generation(graph_pyg, comms, comm_index, inv_map):
         for j in comms[comm_index]:
             y[inv_map[j]] = 1
     graph_pyg.y = torch.tensor(y)
-    # print(f'line 132 in utils.py: number of positive nodes: {sum(graph_pyg.y)}', flush=True)
+    # print(f'line 135 in utils.py: number of positive nodes: {sum(graph_pyg.y)}', flush=True)
 
     return graph_pyg
 

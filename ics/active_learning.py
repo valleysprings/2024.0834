@@ -191,7 +191,7 @@ def aggregated_sampling(selected_indices, uncertainty_scores, ppr_vec,
             #     info_score = (info_score - info_mu) / info_sigma
             
         if simple_aggregation:
-            # print(f"line 193 in active_learning.py: simple aggregation")
+            # print(f"line 194 in active_learning.py: simple aggregation")
             aggregation_scores = topo_score + info_score
         elif beta_sampled_aggregation:
             a, b = 2, 2 * (max_active_learning_round - current_active_learning_round + 1) / (max_active_learning_round + 1)
@@ -199,7 +199,7 @@ def aggregated_sampling(selected_indices, uncertainty_scores, ppr_vec,
             # print(f"line 199 in active_learning.py: alpha: {a}, beta: {b}, sample: {sample}")
             aggregation_scores = topo_score * (1 - sample) + info_score * sample
         else:
-            # print(f'line 195 in active_learning.py: time_decay: {time_decay}')
+
             if time_decay:
                 aggregation_scores = np.log(np.exp(topo_score / (temperature_1 * (current_active_learning_round + 1))) + 
                                     np.exp(info_score / (temperature_2 * (max_active_learning_round - current_active_learning_round))))

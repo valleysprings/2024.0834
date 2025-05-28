@@ -228,7 +228,7 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
     max_node = min(subgraph_max_node, max_valid_idx)
     subgraph_min_node = min(subgraph_min_node, max_node - 1) - 1
     if verbose:
-        print(f'line 230 in subgraph_search.py: max_node: {max_node}', flush=True)
+        print(f'line 231 in subgraph_search.py: max_node: {max_node}', flush=True)
     
     for i in range(max_node - 1):
         if log_transform:
@@ -239,7 +239,7 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
         ratio.append(res)
     ratio = sorted(ratio, key=lambda x: x[1], reverse=True)
     if verbose:
-        print(f'line 241 in subgraph_search.py: ratio: {ratio}', flush=True)
+        print(f'line 242 in subgraph_search.py: ratio: {ratio}', flush=True)
 
     while len(subgraph_nodes) < subgraph_min_node:
         for idx, val in ratio:
@@ -249,7 +249,7 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
                 break
     subgraph_nodes = torch.tensor(subgraph_nodes)
     if verbose:
-        print(f'line 251 in subgraph_search.py: subgraph_nodes: {subgraph_nodes}', flush=True)
+        print(f'line 252 in subgraph_search.py: subgraph_nodes: {subgraph_nodes}', flush=True)
         
     return subgraph_nodes, values, sorted_values_with_index
 
@@ -336,7 +336,7 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
     pos_nodes = [int(node) for node in pos_nodes]
     
     if verbose:
-        print(f'line 338 in subgraph_search.py: positive nodes for subgraph search: {pos_nodes}', flush=True)
+        print(f'line 339 in subgraph_search.py: positive nodes for subgraph search: {pos_nodes}', flush=True)
         
     if is_bfs:
         subgraph_nodes = subgraph_candidiate_bfs_fixed(gt_graph, pos_nodes, subgraph_max_node)
@@ -384,9 +384,9 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
         
     # change original_graph_pyg train_mask
     if verbose:
-        print(f'line 386 in subgraph_search.py: number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
-        print(f'line 387 in subgraph_search.py: type of positive nodes: {type(pos_nodes)}', f'type of negative nodes: {type(neg_nodes)}')
-        print(f'line 388 in subgraph_search.py: pos_nodes: {pos_nodes}', f'neg_nodes: {neg_nodes}', flush=True)
+        print(f'line 387 in subgraph_search.py: number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
+        print(f'line 388 in subgraph_search.py: type of positive nodes: {type(pos_nodes)}', f'type of negative nodes: {type(neg_nodes)}')
+        print(f'line 389 in subgraph_search.py: pos_nodes: {pos_nodes}', f'neg_nodes: {neg_nodes}', flush=True)
     train_mask = torch.zeros(full_graph_pyg.num_nodes, dtype=torch.bool)
     train_mask[pos_nodes] = True
     train_mask[neg_nodes] = True
@@ -395,8 +395,8 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
     # print(f'full graph x shape: {full_graph_pyg.x.shape}', f'full graph y shape: {full_graph_pyg.y.shape}, edge_index shape: {full_graph_pyg.edge_index.shape}', flush=True)
     subgraph_pyg = full_graph_pyg.subgraph(subgraph_nodes)
     if verbose:
-        print(f'line 397 in subgraph_search.py: subgraph_pyg.train_mask: {subgraph_pyg.train_mask}', flush=True)
-        print(f'line 398 in subgraph_search.py: subgraph_pyg.y: {subgraph_pyg.y}', flush=True)
+        print(f'line 398 in subgraph_search.py: subgraph_pyg.train_mask: {subgraph_pyg.train_mask}', flush=True)
+        print(f'line 399 in subgraph_search.py: subgraph_pyg.y: {subgraph_pyg.y}', flush=True)
     
     if dynamic_subgraph_method is not None:
         subgraph_pyg = dynamic_subgraph_rep(subgraph_pyg, dynamic_subgraph_method, sorted_values_with_index)

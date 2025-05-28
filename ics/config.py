@@ -5,9 +5,7 @@ def parse_args():
     
     # dataset
     parser.add_argument('--dataset', type=str, default='amazon',
-                      choices=['amazon', 'youtube', 'dblp', 'lj', 'orkut', 'cora', 'citeseer', 
-                              'pubmed', 'dolphins', 'karate', 'eu-core', 'football',
-                              'eu-core_undirected', 'eu-core_directed', 'yelp', 'amazon_cn'],
+                      choices=['amazon', 'youtube', 'dblp', 'lj', 'dolphins', 'karate', 'eu-core', 'football'],
                       help='Dataset to use')
     parser.add_argument('--simulation', action='store_true',
                       help='Whether to use simulation graph')

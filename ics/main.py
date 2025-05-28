@@ -153,7 +153,7 @@ class PPR_ICS:
                 # print(f'line 153 in main.py: comms: {comms}', flush=True)
             else:
                 comms = communities_generation_pyg(graph_pyg)
-            # print(f'line 155 in main.py: comms: {comms}', flush=True)
+
             return graph_gt, graph_pyg, None, comms
         elif dataset in ['eu-core_directed', 'eu-core_undirected']:
             graph_pyg = load_graph_pyg(dataset, method='node2vec')
@@ -167,17 +167,17 @@ class PPR_ICS:
                     graph_pyg_emb = load_graph_pyg('eu-core_undirected', method='node2vec')
                     graph_pyg.x = graph_pyg_emb.x
                     if self.verbose:
-                        print(f'line 156 in main.py: change embedding to undirected', flush=True)
+                        print(f'line 170 in main.py: change embedding to undirected', flush=True)
                 if self.directed_using_undirected_GNN:
                     graph_pyg_gnn = load_graph_pyg('eu-core_undirected', method='node2vec')
                     graph_pyg.edge_index = graph_pyg_gnn.edge_index
                     if self.verbose:
-                        print(f'line 161 in main.py: change GNN to undirected', flush=True)
+                        print(f'line 175 in main.py: change GNN to undirected', flush=True)
                 if self.directed_using_undirected_PPR:
                     graph_pyg_ppr = load_graph_pyg('eu-core_undirected', method='node2vec')
                     graph_gt.add_edge_list(graph_pyg_ppr.edge_index.t())
                     if self.verbose:
-                        print(f'line 166 in main.py: change PPR to undirected', flush=True)
+                        print(f'line 180 in main.py: change PPR to undirected', flush=True)
                 else:
                     graph_pyg_directed = load_graph_pyg('eu-core_directed', method='node2vec')
                     graph_gt.add_edge_list(graph_pyg_directed.edge_index.t())  
@@ -186,8 +186,8 @@ class PPR_ICS:
                 seed_torch(self.seed)
             
             # print graph_gt and graph_pyg profile
-            print(f'line 175 in main.py: graph_gt profile: {graph_gt.num_vertices()}, {graph_gt.num_edges()}', flush=True)
-            print(f'line 176 in main.py: graph_pyg profile: {graph_pyg.num_nodes}, {graph_pyg.num_edges}', flush=True)
+            print(f'line 189 in main.py: graph_gt profile: {graph_gt.num_vertices()}, {graph_gt.num_edges()}', flush=True)
+            print(f'line 190 in main.py: graph_pyg profile: {graph_pyg.num_nodes}, {graph_pyg.num_edges}', flush=True)
             
             return graph_gt, graph_pyg, None, comms
         elif self.simulation_graph_type in ['lfr', 'pp'] and self.simulation:
@@ -219,9 +219,9 @@ class PPR_ICS:
         
         if self.verbose:
             labels, hist = label_components(self.graph_gt, directed=False)
-            print(f'line 195 in main.py: number of CC: {max(labels) + 1}', flush=True)
+            print(f'line 222 in main.py: number of CC: {max(labels) + 1}', flush=True)
             labels, hist = label_components(self.graph_gt, directed=True)
-            print(f'line 197 in main.py: number of SCC: {max(labels) + 1}', flush=True)
+            print(f'line 224 in main.py: number of SCC: {max(labels) + 1}', flush=True)
 
         for i, comm_index in tqdm(enumerate(comms_index), total=len(comms_index), desc="Processing communities", ncols=100, disable=True):
 
@@ -247,7 +247,7 @@ class PPR_ICS:
             
             if self.verbose:
                 print(f'\n' * 2, f'*' * 100, flush=True)
-                print(f'line 223 in main.py: start community {comm_index} \n', flush=True)
+                print(f'line 250 in main.py: start community {comm_index} \n', flush=True)
 
             t_sub_start = time.time()
             if self.is_subgraph:
@@ -269,14 +269,14 @@ class PPR_ICS:
                 subgraph_ablation_para_track_list[comm_index].append(additional_info['num_partition_selected'])
                 
             if self.verbose:
-                print(f'line 245 in main.py: Initial subgraph for community {comm_index} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
+                print(f'line 272 in main.py: Initial subgraph for community {comm_index} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
                 if self.inv_map is not None:
-                    print(f'line 247 in main.py: Ground truth: {[self.inv_map[i] for i in self.comms[comm_index]]}', flush=True)
+                    print(f'line 274 in main.py: Ground truth: {[self.inv_map[i] for i in self.comms[comm_index]]}', flush=True)
                 else:
-                    print(f'line 249 in main.py: Ground truth: {self.comms[comm_index]}', flush=True)
+                    print(f'line 276 in main.py: Ground truth: {self.comms[comm_index]}', flush=True)
                 
-                print(f'line 251 in main.py: Positive nodes: {pos_nodes}', flush=True)
-                print(f'line 252 in main.py: Negative nodes: {neg_nodes}', flush=True)
+                print(f'line 278 in main.py: Positive nodes: {pos_nodes}', flush=True)
+                print(f'line 279 in main.py: Negative nodes: {neg_nodes}', flush=True)
 
             t_sub_list[comm_index].append(t_sub_end - t_sub_start)
             
@@ -356,11 +356,11 @@ class PPR_ICS:
                             probs_test = output[~subgraph_pyg.train_mask]
                             logits_train = torch.log(probs_train / (1 - probs_train))
                             logits_test = torch.log(probs_test / (1 - probs_test))
-                            # print(f'line 332 in main.py: probs_train: {probs_train}')
-                            # print(f'line 333 in main.py: probs_test: {probs_test}')
-                            # print(f'line 334 in main.py: logits_train: {logits_train}')
-                            # print(f'line 335 in main.py: logits_test: {logits_test}')
-                            print(f'line 336 in main.py: loss_gap: {loss_gap.mean()}')
+                            # print(f'line 359 in main.py: probs_train: {probs_train}')
+                            # print(f'line 360 in main.py: probs_test: {probs_test}')
+                            # print(f'line 361 in main.py: logits_train: {logits_train}')
+                            # print(f'line 362 in main.py: logits_test: {logits_test}')
+                            print(f'line 363 in main.py: loss_gap: {loss_gap.mean()}')
                         if loss_gap.mean() < self.loss_ma_threshold:
                             break
 
@@ -406,24 +406,24 @@ class PPR_ICS:
                 
                 if self.verbose:
                     print('-' * 100)
-                    print(f'line 383 in main.py: Round {i} summary')
-                    print(f'line 384 in main.py: F1: {f1:.4f}', f'Recall: {recall:.4f}', f'Precision: {precision:.4f}', f'Jaccard: {jaccard:.4f}', f'NMI: {nmi:.4f}')
-                    print(f'line 385 in main.py: F1 (subgraph): {f1_subgraph:.4f}', f'Recall (subgraph): {recall_subgraph:.4f}', f'Precision (subgraph): {precision_subgraph:.4f}', f'Jaccard (subgraph): {jaccard_subgraph:.4f}', f'NMI (subgraph): {nmi_subgraph:.4f}')
-                    print(f'line 386 in main.py: all subgraph nodes indices: {subgraph_pyg.gt_index}, ground truth: {self.comms[comm_index]}')
-                    print(f'line 387 in main.py: predicted positive nodes indices: {subgraph_pyg.gt_index[y_pred.cpu().numpy() == 1]}, intersection: {np.intersect1d(self.comms[comm_index], subgraph_pyg.gt_index[y_pred.cpu().numpy() == 1])}')
-                    print(f'line 388 in main.py: number of predicted positive nodes: {y_pred.sum()}', f'number of subgraph true positive nodes: {subgraph_pyg.y.sum()}', f'number of community true positive nodes: {len(np.intersect1d(self.comms[comm_index], subgraph_pyg.gt_index[y_pred.cpu().numpy() == 1]))}', f'number of subgraph nodes: {len(y_pred)}',)
-                    print(f'line 389 in main.py: number of non-label nodes: {len(filter_indices(subgraph_pyg))}')
+                    print(f'line 409 in main.py: Round {i} summary')
+                    print(f'line 410 in main.py: F1: {f1:.4f}', f'Recall: {recall:.4f}', f'Precision: {precision:.4f}', f'Jaccard: {jaccard:.4f}', f'NMI: {nmi:.4f}')
+                    print(f'line 411 in main.py: F1 (subgraph): {f1_subgraph:.4f}', f'Recall (subgraph): {recall_subgraph:.4f}', f'Precision (subgraph): {precision_subgraph:.4f}', f'Jaccard (subgraph): {jaccard_subgraph:.4f}', f'NMI (subgraph): {nmi_subgraph:.4f}')
+                    print(f'line 412 in main.py: all subgraph nodes indices: {subgraph_pyg.gt_index}, ground truth: {self.comms[comm_index]}')
+                    print(f'line 413 in main.py: predicted positive nodes indices: {subgraph_pyg.gt_index[y_pred.cpu().numpy() == 1]}, intersection: {np.intersect1d(self.comms[comm_index], subgraph_pyg.gt_index[y_pred.cpu().numpy() == 1])}')
+                    print(f'line 414 in main.py: number of predicted positive nodes: {y_pred.sum()}', f'number of subgraph true positive nodes: {subgraph_pyg.y.sum()}', f'number of community true positive nodes: {len(np.intersect1d(self.comms[comm_index], subgraph_pyg.gt_index[y_pred.cpu().numpy() == 1]))}', f'number of subgraph nodes: {len(y_pred)}',)
+                    print(f'line 415 in main.py: number of non-label nodes: {len(filter_indices(subgraph_pyg))}')
                     print('-' * 100)
                     
                 if y_pred.sum() > self.sim1_threshold * len(y_pred) or len(filter_indices(subgraph_pyg)) <= (1 - self.sim2_threshold) * len(y_pred):
                     if self.verbose:
-                        print(f'line 394 in main.py: Early stop for community {comm_index} at round {i} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
+                        print(f'line 420 in main.py: Early stop for community {comm_index} at round {i} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
                     break
 
                 
                 if i == self.al_round:
                     if self.verbose:
-                        print(f'line 400 in main.py: Total time for community {comm_index}: {sum(t_sub_list[comm_index]) + sum(t_gnn_list[comm_index]) + sum(t_al_list[comm_index]) + sum(t_eval_list[comm_index]):.4f}')
+                        print(f'line 426 in main.py: Total time for community {comm_index}: {sum(t_sub_list[comm_index]) + sum(t_gnn_list[comm_index]) + sum(t_al_list[comm_index]) + sum(t_eval_list[comm_index]):.4f}')
                     break
 
                 t_al_start = time.time()
@@ -443,8 +443,8 @@ class PPR_ICS:
                     neg_nodes = np.concatenate((neg_nodes, neg))
                     
                     if self.verbose:
-                        print(f'line 419 in main.py: For next round, number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
-                        print(f'line 420 in main.py: For next round, positive nodes: {pos_nodes}', f'negative nodes: {neg_nodes}')
+                        print(f'line 446 in main.py: For next round, number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
+                        print(f'line 447 in main.py: For next round, positive nodes: {pos_nodes}', f'negative nodes: {neg_nodes}')
                     
                     t_sub_start = time.time()
                     if self.is_subgraph:
