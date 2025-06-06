@@ -10,6 +10,7 @@ Computing](https://pubsonline.informs.org/journal/ijoc) under the [MIT License](
 To cite the contents of this repository, please cite both the paper and this repo, using their respective DOIs.
 
 https://doi.org/10.1287/ijoc.2024.0834
+
 https://doi.org/10.1287/ijoc.2024.0834.cd
 
 Below is the BibTex for citing this snapshot of the repository.
