@@ -163,17 +163,17 @@ class PPR_ICS:
                     graph_pyg_emb = load_graph_pyg('eu-core_undirected', method='node2vec')
                     graph_pyg.x = graph_pyg_emb.x
                     if self.verbose:
-                        print(f'line 170 in main.py: change embedding to undirected', flush=True)
+                        print(f'line 166 in main.py: change embedding to undirected', flush=True)
                 if self.directed_using_undirected_GNN:
                     graph_pyg_gnn = load_graph_pyg('eu-core_undirected', method='node2vec')
                     graph_pyg.edge_index = graph_pyg_gnn.edge_index
                     if self.verbose:
-                        print(f'line 175 in main.py: change GNN to undirected', flush=True)
+                        print(f'line 171 in main.py: change GNN to undirected', flush=True)
                 if self.directed_using_undirected_PPR:
                     graph_pyg_ppr = load_graph_pyg('eu-core_undirected', method='node2vec')
                     graph_gt.add_edge_list(graph_pyg_ppr.edge_index.t())
                     if self.verbose:
-                        print(f'line 180 in main.py: change PPR to undirected', flush=True)
+                        print(f'line 176 in main.py: change PPR to undirected', flush=True)
                 else:
                     graph_pyg_directed = load_graph_pyg('eu-core_directed', method='node2vec')
                     graph_gt.add_edge_list(graph_pyg_directed.edge_index.t())  
@@ -241,7 +241,7 @@ class PPR_ICS:
                 subgraph_ablation_para_track_list[comm_index].append(additional_info['num_partition_selected'])
                 
             if self.verbose:
-                print(f'line 248 in main.py: Initial subgraph for community {comm_index} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
+                print(f'line 244 in main.py: Initial subgraph for community {comm_index} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
 
             t_sub_list[comm_index].append(t_sub_end - t_sub_start)
             
@@ -305,7 +305,7 @@ class PPR_ICS:
                     if epoch % 20 == 0 and epoch > 0:
                         loss_gap = np.array(loss_seq[-20:]) - loss.item()
                         if self.verbose:
-                            print(f'line 312 in main.py: loss_gap: {loss_gap.mean()}')
+                            print(f'line 308 in main.py: loss_gap: {loss_gap.mean()}')
                         if loss_gap.mean() < self.loss_ma_threshold:
                             break
 
@@ -352,13 +352,13 @@ class PPR_ICS:
                     
                 if y_pred.sum() > self.sim1_threshold * len(y_pred) or len(filter_indices(subgraph_pyg)) <= (1 - self.sim2_threshold) * len(y_pred):
                     if self.verbose:
-                        print(f'line 359 in main.py: Early stop for community {comm_index} at round {i} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
+                        print(f'line 355 in main.py: Early stop for community {comm_index} at round {i} with {subgraph_pyg.num_nodes} nodes and {subgraph_pyg.num_edges} edges', flush=True)
                     break
 
                 
                 if i == self.al_round:
                     if self.verbose:
-                        print(f'line 365 in main.py: Total time for community {comm_index}: {sum(t_sub_list[comm_index]) + sum(t_gnn_list[comm_index]) + sum(t_al_list[comm_index]) + sum(t_eval_list[comm_index]):.4f}')
+                        print(f'line 361 in main.py: Total time for community {comm_index}: {sum(t_sub_list[comm_index]) + sum(t_gnn_list[comm_index]) + sum(t_al_list[comm_index]) + sum(t_eval_list[comm_index]):.4f}')
                     break
 
                 t_al_start = time.time()
@@ -378,8 +378,8 @@ class PPR_ICS:
                     neg_nodes = np.concatenate((neg_nodes, neg))
                     
                     if self.verbose:
-                        print(f'line 385 in main.py: For next round, number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
-                        print(f'line 386 in main.py: For next round, positive nodes: {pos_nodes}', f'negative nodes: {neg_nodes}')
+                        print(f'line 381 in main.py: For next round, number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
+                        print(f'line 382 in main.py: For next round, positive nodes: {pos_nodes}', f'negative nodes: {neg_nodes}')
                     
                     t_sub_start = time.time()
                     if self.is_subgraph:
