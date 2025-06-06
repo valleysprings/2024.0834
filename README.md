@@ -41,14 +41,14 @@ This code is tested under Python 3.10 (under conda) with following dependencies:
 - `graph-tool` `numpy<2` `pytorch==1.12.0` (using conda to install)
 - `scikit-learn` `networkx[default]` `torch_geometric` `cdlib` `metis` `datasketch` (using pip to install)
   - For `metis` (which is used for ablation study), you should also install
-  ```bash
-  sudo apt-get install libmetis-dev
-  ```
+    ```bash
+    sudo apt-get install libmetis-dev
+    ```
 - `pyg-lib` (used for generating Node2vec embedding)
   - If running with torch 1.12.0 with cuda 11.6 then simply run
-  ```bash
-  pip install pyg-lib -f https://data.pyg.org/whl/torch-1.12.0+cu116.html
-  ```
+    ```bash
+    pip install pyg-lib -f https://data.pyg.org/whl/torch-1.12.0+cu116.html
+    ```
 
 
 Environment:
@@ -74,17 +74,16 @@ The experiments in our paper were conducted on an Ubuntu 22.04 system with two R
 
 - (in dataset folder) Download additional graph datasets (e.g., DBLP, YouTube, LiveJournal) from SNAP (https://snap.stanford.edu/data/index.html#communities). Amazon dataset along with four small datasets (Dolphins, Football, Karate, and EU-core) are already provided in the dataset folder for reference.
 - (in experiments folder) Perform preprocessing (mainly to add Node2vec embedding to each dataset). Four small datasets (Dolphins, Football, Karate, and EU-core) are prepared for reference.
-```bash
-sh exp_preprocess.sh
-```
-3. Create log folder in the main directory.
+  ```bash
+  sh exp_preprocess.sh
+  ```
+- Create log folder in the main directory.
 
 
 
 ## Running Evaluations
 
-### Runing the main pipeline
-Perform community search for 8 datasets:
+Main pipeline: Using the following script to perform community search for 8 datasets:
 ```bash
 sh exp_comet_main.sh
 ```
