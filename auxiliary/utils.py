@@ -3,7 +3,7 @@ import random
 from networkx import nodes
 import pandas as pd
 import graph_tool.all as gt
-from graph_tool.draw import sfdp_layout, radial_tree_layout, arf_layout, fruchterman_reingold_layout
+from graph_tool.draw import sfdp_layout
 from torch_geometric.utils import subgraph, k_hop_subgraph
 
 import torch
@@ -205,10 +205,6 @@ def calculate_stats(full_graph_pyg, subgraph, y_pred):
     jaccard = jaccard_score(y_true, y_pred)
     nmi = normalized_mutual_info_score(y_true, y_pred)
 
-    # print('precision: ', precision)
-    # print('recall: ', recall)
-    # print('f1: ', f1)
-
     return precision, recall, f1, jaccard, nmi
 
 def attributes_sims(subgraph, method):
@@ -232,24 +228,6 @@ def visualize_graph(full_graph_pyg=None, subgraph_pyg=None, y_pred=None, y_true=
     pos_nodes_suffix = '-'.join([str(i) for i in pos_nodes])
     output_name = output_name.replace('.pdf', '') + '_' + pos_nodes_suffix + '.pdf'
 
-    # if full_graph_pyg is not None and y_true is not None and y_pred is None:
-    #     # demonstration of ground truth community
-    #     subgraph_pyg = full_graph_pyg.subgraph(y_true)
-    #     # find one-hop neighbors
-    #     # subset, edge_index, mapping, edge_mask = k_hop_subgraph(y_true, 1, full_graph_pyg.edge_index)
-    #     # subgraph_pyg_one_hop_edge_index = edge_index
-    #     # print('subgraph_pyg: ', subgraph_pyg.edge_index)
-    #     G.add_edge_list(subgraph_pyg.edge_index.t().cpu().numpy())
-    #     # G_aug.add_edge_list(subgraph_pyg_one_hop_edge_index.t().cpu().numpy())
-    #     pos = radial_tree_layout(G)
-    #     # pos_aug = sfdp_layout(G_aug)
-    #     deg = G.degree_property_map('total')
-    #     deg.a = 2 * (np.sqrt(deg.a) * 10 + 0.5)
-    #     gt.graph_draw(G, pos=pos, vertex_size=deg, vertex_fill_color="#9DC3E6", edge_pen_width=10, output_size=(500, 500), output= prefix + output_name)
-    #     # gt.graph_draw(G_aug, pos=pos_aug, vertex_size=deg_aug, output_size=(500, 500), output= prefix + 'one_hop_' + output_name)
-
-    #     return
-    
     if full_graph_pyg is not None and subgraph_pyg is not None and y_pred is not None and y_true is not None:
         # demonstration of predicted community
         # print('y_pred: ', y_pred)
@@ -268,12 +246,7 @@ def visualize_graph(full_graph_pyg=None, subgraph_pyg=None, y_pred=None, y_true=
         y_true_one_hop = full_graph_pyg.subgraph(subset)
         subset, edge_index, mapping, edge_mask = k_hop_subgraph(subgraph_pyg_nodes, 1, full_graph_pyg.edge_index)
         subgraph_pyg_one_hop = full_graph_pyg.subgraph(subset)
-        
-        
-        
-        y_true_one_hop_nodes = y_true_one_hop.gt_index
-        y_pred_one_hop_nodes = y_pred_one_hop.gt_index
-        subgraph_pyg_one_hop_nodes = subgraph_pyg_one_hop.gt_index
+
         
         y_total = y_pred.tolist() + y_true.tolist()
         y_total = set(y_total)
@@ -288,9 +261,7 @@ def visualize_graph(full_graph_pyg=None, subgraph_pyg=None, y_pred=None, y_true=
         # print(subgraph_pyg_rec.edge_index.t().cpu().numpy())
         v_map = {i: subgraph_pyg_rec.gt_index[i].item() for i in range(len(y_total))}
         inv_map = {v: k for k, v in v_map.items()}
-        # print('subgraph_pyg_rec.gt_index', subgraph_pyg_rec.gt_index)
-        # print('inv_map', inv_map)
-        # print('edge_index', subgraph_pyg_rec.edge_index.t().cpu().numpy())
+
         G.add_vertex(len(y_total))
         G.add_edge_list(subgraph_pyg_rec.edge_index.t().cpu().numpy())
         # print('vertices', [i for i in G.vertices()])
@@ -325,10 +296,6 @@ def visualize_graph(full_graph_pyg=None, subgraph_pyg=None, y_pred=None, y_true=
         assert len(color_right.keys()) == len(y_total), 'color length not equal to y_total length'
         
         # legend
-        legend_labels_left = ['Positive query', 'Subgraph nodes', 'Other nodes']
-        legend_handles_left = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=palettes[4], markersize=10),
-                          plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=palettes[0], markersize=10),
-                          plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=palettes[1], markersize=10)]
         
         legend_labels_right = ['True Positive', 'False Positive', 'False Negative', 'True Negative', 'Positive query', 'Negative query']
         legend_handles_right = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=palettes[0], markersize=10),
@@ -349,24 +316,6 @@ def visualize_graph(full_graph_pyg=None, subgraph_pyg=None, y_pred=None, y_true=
         v_prop = G.new_vertex_property("string")
         for i in range(len(y_total)):
             v_prop[G.vertex(i)] = str(v_map[i])
-        
-        # fig, axes = plt.subplots(1, 2, figsize=(20, 10))
-        
-        # a = gt.graph_draw(G, pos=pos, vertex_fill_color = color_map_left, vertex_text=v_prop, vertex_text_position = 1.0, edge_pen_width = 0.01, mplfig=axes[0])
-        # a.fit_view()
-        # axes[0].legend(legend_handles_left, legend_labels_left, loc='upper right', bbox_to_anchor=(1, 1), fontsize=15)
-        
-        # a = gt.graph_draw(G, pos=pos, vertex_fill_color = color_map_right, vertex_text=v_prop, vertex_text_position = 1.0, edge_pen_width = 0.01, mplfig=axes[1])
-        # a.fit_view()
-        # axes[1].legend(legend_handles_right, legend_labels_right, loc='upper right', bbox_to_anchor=(1, 1), fontsize=15)
-        
-        # remove coordinates
-        # axes[0].set_axis_off()
-        # axes[1].set_axis_off()
-        # axes[0].tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
-        # axes[1].tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
-        
-        # plt.tight_layout()
         
         # single graph
         plt.switch_backend("cairo")
@@ -391,34 +340,7 @@ def visualize_ppr(ppr, y_true, dataset, comms_num):
     prefix = '../visualization/case_study_pics/'
     output_path = prefix + dataset + '_ppr_' +  str(comms_num) + '.pdf' 
 
-    # Create a figure with two subplots
-    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
     fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-
-    # Subplot a: Visualize the ratio
-    # ratio = []
-    # log_ppr = np.log(ppr)
-    # for i in range(len(ppr)):
-    #     ratio.append((i, ppr[i]))
-    # nodes_a, values_a = zip(*ratio[:100])
-    # colors_a = ['red' if node == y_true else 'blue' for node in nodes_a]
-    # ax1.bar(range(100), values_a, color=colors_a)
-    # ax1.set_title('Top 100 Nodes by Ratio')
-    # ax1.set_xlabel('Nodes')
-    # ax1.set_ylabel('Ratio Value')
-    # # ax1.axvline(nodes_a.index(y_true), color='green', linestyle='--', label=f'Ground Truth Node: {y_true}')
-    # ax1.legend()
-
-    # Subplot b: Visualize the ppr
-    # nodes_b, values_b = zip(*ppr[:100])
-    # colors_b = ['red' if node == y_true else 'blue' for node in nodes_b]
-    # ax2.bar(range(100), values_b, color=colors_b)
-    # ax2.set_yscale('log')
-    # ax2.set_title('Top 100 Nodes by PPR')
-    # ax2.set_xlabel('Nodes')
-    # ax2.set_ylabel('PPR Value (log scale)')
-    # # ax2.axvline(nodes_b.index(y_true), color='green', linestyle='--', label=f'Ground Truth Node: {y_true}')
-    # ax2.legend()
 
     nodes, values = zip(*ppr[:100])
     print('nodes: ', nodes)

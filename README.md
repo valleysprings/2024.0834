@@ -29,7 +29,13 @@ Below is the BibTex for citing this snapshot of the repository.
 
 ## Overview
 
-The goal of our work is to find query-driven cohesive subgraphs in an multi-rounded fashion. We use Personalized PageRank, coupled with Graph Neural Network to build a framework that achieves SOTA in most community search benchmarks.
+Community search (CS) is a fundamental problem in graph mining, where the goal is to find communities that are relevant to a given query. Traditional CS methods often struggle with scalability and effectiveness, especially when dealing with large graphs or complex queries.
+
+To address these challenges, we introduce COMET, a novel interactive framework for community search that integrates active learning and graph neural networks (GNNs). COMET is designed to efficiently identify relevant communities in large graphs while minimizing user interaction.
+
+![Framework](pics/framework.png)
+
+Our objective is to identify query-driven cohesive subgraphs through a multi-round process. We leverage Personalized PageRank in conjunction with Graph Neural Networks to develop a framework that achieves state-of-the-art performance on most community search benchmarks.
 
 ## Requirements
 
@@ -60,14 +66,16 @@ The experiments in our paper were conducted on an Ubuntu 22.04 system equipped w
 ├── experiments
 ├── ics
 ├── log
-└── preprocess
+├── pics
+├── preprocess
+└── visualization
 ```
 
 
 ## Setup Instructions
 
-1. (in dataset folder) Download graph data from SNAP. Amazon dataset along with four small datasets (Dophins, Football, Karate, and EU-core) are already provided in the dataset folder for reference.
-2. (in experiments folder) Perform preprocessing (mainly to add Node2vec embedding to each dataset). Karate dataset is perpared for reference.
+1. (in dataset folder) Download additional graph data from SNAP. Amazon dataset along with four small datasets (Dolphins, Football, Karate, and EU-core) are already provided in the dataset folder for reference.
+2. (in experiments folder) Perform preprocessing (mainly to add Node2vec embedding to each dataset).Amazon dataset along with four small datasets (Dolphins, Football, Karate, and EU-core) are prepared for reference.
 ```bash
 sh exp_preprocess.sh
 ```
@@ -83,18 +91,18 @@ Perform community search for 8 datasets:
 sh exp_comet_main.sh
 ```
 
-**Important Parameters to adjust in the main pipeline:**
-- dataset: Evaluation dataset
+**Key Parameters to Adjust in the Main Pipeline:**
+- dataset: Dataset used for evaluation
 - pos_num: Number of positive labels per community at the first round
 - neg_num: Number of negative labels per community at the first round
-- num_queries: Number of CS queries, can be larger than the total number of communities (sampling with replacement)
+- num_queries: Number of CS queries; can exceed the number of communities (sampling with replacement)
 - damping: Damping factor for PPR
 - epsilon: Epsilon for PPR
 - al_method: Active learning method
-- al_round: Number of rounds for active learning
+- al_round: Number of active learning rounds
 - model: Type of GNN model to use for node classification
-- epochs: Number of epochs for GNN model
-- learning_rate: Learning rate for GNN model (using Adam optimizer as default)
-- hidden_layers: Hidden layers for GNN model
-- gnn_threshold: Classification threshold for GNN model
+- epochs: Number of training epochs for the GNN model
+- learning_rate: Learning rate for the GNN model (default optimizer: Adam)
+- hidden_layers: Number and size of hidden layers in the GNN model
+- gnn_threshold: Classification threshold for the GNN model
 - seed: Random seed

@@ -9,8 +9,6 @@ from torch_geometric.utils import to_networkx
 import metis
 import subprocess
 import os
-# from karateclub import GraRep, Diff2Vec, NodeSketch
-import multiprocessing
 
 # For k-truss and k-core precompute
 ktruss_graph = {}
@@ -25,10 +23,6 @@ def precompute(graph_pyg, is_kcore=False, is_ktruss=False, is_metis=False, k=-1,
     # change graph_pyg to nx_graph
     global nx_graph
     nx_graph = to_networkx(graph_pyg, to_undirected=True)
-    # assert nx.is_connected(nx_graph)
-    # assert nx_graph.number_of_nodes() == graph_pyg.num_nodes
-    # assert nx_graph.number_of_edges() == graph_pyg.num_edges
-    # assert nx_graph.number_of_nodes() == max(nx_graph.nodes) + 1
     
     # remove loop
     nx_graph.remove_edges_from(nx.selfloop_edges(nx_graph))
@@ -163,7 +157,7 @@ def revise_simrank_cpp(dataset, pos_nodes, subgraph_max_node=1e3, num_nodes=None
     # print(flag)
         
     if flag == 1:
-        # run the cpp program
+        # run the cpp program, if you want to run it, please make sure you have the ExactSim binary in the correct path
         try:
             res = subprocess.run(
                 ["../ablation/ExactSim/EXSim", 
@@ -215,9 +209,6 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
         values = [val / (graph_gt.vertex(int(idx)).out_degree() + graph_gt.vertex(int(idx)).in_degree()) for idx, val in enumerate(values)]
         values = np.array(values)
     sorted_values_with_index = sorted(enumerate(values), key=lambda x: x[1], reverse=True)
-    # if verbose:
-    #     print(f'line 219 in subgraph_search.py: sorted_values_with_index: {sorted_values_with_index}', flush=True)
-    #     print(f'line 220 in subgraph_search.py: values: {values}', flush=True)
         
     subgraph_nodes, ratio = [], []
     max_valid_idx = len(sorted_values_with_index) - 1
@@ -227,8 +218,6 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
             break
     max_node = min(subgraph_max_node, max_valid_idx)
     subgraph_min_node = min(subgraph_min_node, max_node - 1) - 1
-    if verbose:
-        print(f'line 231 in subgraph_search.py: max_node: {max_node}', flush=True)
     
     for i in range(max_node - 1):
         if log_transform:
@@ -238,8 +227,6 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
         res = (i, r)
         ratio.append(res)
     ratio = sorted(ratio, key=lambda x: x[1], reverse=True)
-    if verbose:
-        print(f'line 242 in subgraph_search.py: ratio: {ratio}', flush=True)
 
     while len(subgraph_nodes) < subgraph_min_node:
         for idx, val in ratio:
@@ -249,7 +236,7 @@ def subgraph_candidate_adaptable_new(graph_gt, query, subgraph_min_node=10, subg
                 break
     subgraph_nodes = torch.tensor(subgraph_nodes)
     if verbose:
-        print(f'line 252 in subgraph_search.py: subgraph_nodes: {subgraph_nodes}', flush=True)
+        print(f'line 239 in subgraph_search.py: subgraph_nodes: {subgraph_nodes}', flush=True)
         
     return subgraph_nodes, values, sorted_values_with_index
 
@@ -299,12 +286,6 @@ def subgraph_candidate_ppr_fixed(graph_gt, query, subgraph_max_node=400, degree_
         values = np.array(values)
     sorted_values_with_index = sorted(enumerate(values), key=lambda x: x[1], reverse=True)
 
-    # subgraph_nodes = []
-
-    # for idx, (node, val) in enumerate(sorted_values_with_index):
-    #     subgraph_nodes.append(node)
-    #     if idx > subgraph_max_node:
-    #         break
     
     subgraph_nodes = [node for node, _ in sorted_values_with_index[:subgraph_max_node]]
 
@@ -336,7 +317,7 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
     pos_nodes = [int(node) for node in pos_nodes]
     
     if verbose:
-        print(f'line 339 in subgraph_search.py: positive nodes for subgraph search: {pos_nodes}', flush=True)
+        print(f'line 320 in subgraph_search.py: positive nodes for subgraph search: {pos_nodes}', flush=True)
         
     if is_bfs:
         subgraph_nodes = subgraph_candidiate_bfs_fixed(gt_graph, pos_nodes, subgraph_max_node)
@@ -359,18 +340,12 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
         subgraph_nodes, values, sorted_values_with_index = subgraph_candidate_ppr_fixed(gt_graph, pos_nodes, subgraph_max_node, degree_normalized, damping, epsilon)
     else:
         subgraph_nodes, values, sorted_values_with_index = subgraph_candidate_adaptable_new(gt_graph, pos_nodes, subgraph_min_node, subgraph_max_node, degree_normalized, damping, epsilon, log_transform, verbose)
-        # subgraph_nodes, values, sorted_values_with_index = subgraph_candidate_adaptable(gt_graph, pos_nodes, threshold, subgraph_min_node, subgraph_max_node, degree_normalized)
-    # assert pos_nodes are in subgraph_nodes
-    # assert len([pos_node for pos_node in pos_nodes if pos_node not in subgraph_nodes]) == 0
-    # neg_nodes may not in subgraph_nodes
-    # print(neg_nodes, flush=True)
+
     
     # generate aggregated scores since it uses ppr scores
     if al_method == 'aggregated' and values is None:
         _, values, sorted_values_with_index = subgraph_candidate_ppr_fixed(gt_graph, pos_nodes, subgraph_max_node, degree_normalized, damping, epsilon)
     
-    # print(al_method, flush=True)
-    # print(type(values), flush=True)
     
     if type(neg_nodes) == int:
         len_neg_nodes = neg_nodes
@@ -384,9 +359,9 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
         
     # change original_graph_pyg train_mask
     if verbose:
-        print(f'line 387 in subgraph_search.py: number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
-        print(f'line 388 in subgraph_search.py: type of positive nodes: {type(pos_nodes)}', f'type of negative nodes: {type(neg_nodes)}')
-        print(f'line 389 in subgraph_search.py: pos_nodes: {pos_nodes}', f'neg_nodes: {neg_nodes}', flush=True)
+        print(f'line 362 in subgraph_search.py: number of positive nodes: {len(pos_nodes)}', f'number of negative nodes: {len(neg_nodes)}')
+        print(f'line 363 in subgraph_search.py: type of positive nodes: {type(pos_nodes)}', f'type of negative nodes: {type(neg_nodes)}')
+        print(f'line 364 in subgraph_search.py: pos_nodes: {pos_nodes}', f'neg_nodes: {neg_nodes}', flush=True)
     train_mask = torch.zeros(full_graph_pyg.num_nodes, dtype=torch.bool)
     train_mask[pos_nodes] = True
     train_mask[neg_nodes] = True
@@ -394,9 +369,6 @@ def revise_subgraph(dataset, full_graph_pyg, gt_graph, pos_nodes, neg_nodes, thr
     # get subgraph from original_graph_pyg using subgraph_nodes
     # print(f'full graph x shape: {full_graph_pyg.x.shape}', f'full graph y shape: {full_graph_pyg.y.shape}, edge_index shape: {full_graph_pyg.edge_index.shape}', flush=True)
     subgraph_pyg = full_graph_pyg.subgraph(subgraph_nodes)
-    if verbose:
-        print(f'line 398 in subgraph_search.py: subgraph_pyg.train_mask: {subgraph_pyg.train_mask}', flush=True)
-        print(f'line 399 in subgraph_search.py: subgraph_pyg.y: {subgraph_pyg.y}', flush=True)
     
     if dynamic_subgraph_method is not None:
         subgraph_pyg = dynamic_subgraph_rep(subgraph_pyg, dynamic_subgraph_method, sorted_values_with_index)
@@ -520,11 +492,6 @@ def revise_metis_cohesive(graph_pyg, pos_nodes, num_partition=-1):
             # determine the subgraph nodes are connected in original graph
             # print(multi_subgraph, flush=True)
             multi_subgraph = list(multi_subgraph)
-        
-            # if nx.is_connected(nx_graph.subgraph(multi_subgraph)):
-            #     subgraph_nodes = multi_subgraph
-            #     num_partition = current_num_partition
-            #     break
             subgraph_nodes = multi_subgraph
             num_partition = current_num_partition
             break
@@ -592,12 +559,6 @@ def dynamic_subgraph_rep(subgraph_pyg, method_selection, sorted_values_with_inde
     elif method_selection == 'gaussian':
         # ics-gnn default
         subgraph_pyg.x = torch.randn(subgraph_size, 100)
-    # elif method_selection == 'nodesketch':
-    #     subgraph_pyg.x = generate_embeddings_nodesketch(subgraph_nx_graph)
-    # elif method_selection == 'diff2vec':
-    #     subgraph_pyg.x = generate_embeddings_diff2vec(subgraph_nx_graph)
-    # elif method_selection == 'grarep':
-    #     subgraph_pyg.x = generate_embeddings_grarep(subgraph_nx_graph)
     else:
         raise ValueError('Invalid method selection')
     
@@ -622,40 +583,3 @@ def generate_embeddings_core_number(subgraph_nx_graph):
     embeddings = embeddings.unsqueeze(1)
     
     return embeddings
-
-
-# def generate_embeddings_grarep(subgraph_nx_graph):
-#     if subgraph_nx_graph.number_of_nodes() <= 32:
-#         dim = subgraph_nx_graph.number_of_nodes() // 2
-#     else:
-#         dim = 32
-        
-#     model = GraRep(
-#         dimensions=dim,
-#         order=3
-#     )
-#     model.fit(subgraph_nx_graph)
-#     embeddings = model.get_embedding()
-#     embeddings = torch.tensor(embeddings, dtype=torch.float)
-#     # print(embeddings.shape, flush=True)
-
-#     return embeddings
-
-
-# def generate_embeddings_diff2vec(subgraph_nx_graph):
-#     model = Diff2Vec(
-#         workers=multiprocessing.cpu_count() * 2,
-#         diffusion_number=1
-#     )
-#     model.fit(subgraph_nx_graph)
-
-#     return model.get_embedding()
-
-
-# def generate_embeddings_nodesketch(subgraph_nx_graph):
-#     model = NodeSketch()
-#     model.fit(subgraph_nx_graph)
-
-#     return model.get_embedding()
-
-      

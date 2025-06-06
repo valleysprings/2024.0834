@@ -190,10 +190,6 @@ class ELPH_modified(torch.nn.Module):
         sf = F.dropout(sf, p=self.feature_dropout, training=self.training)
         
         # add the node features to the structural features
-        # x shape: (num_nodes, out_channels)
-        # sf shape: (num_edges, dim)
-        # aggregated shape: (num_nodes, out_channels + dim)
-        # print(f"x.shape: {x.shape}, sf.shape: {sf.shape}", flush=True) 
         sf_nodes = scatter(sf, edge_index[1], dim=0, dim_size=num_nodes, reduce='sum')
         # print(f"sf_nodes.shape: {sf_nodes.shape}", flush=True)
         x = torch.cat([x, sf_nodes], dim=1)

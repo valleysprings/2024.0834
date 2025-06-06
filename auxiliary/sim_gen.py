@@ -2,33 +2,25 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import os
-from os import environ
-
-import sys
-from cdlib.benchmark import LFR, PP
-
 import argparse
 from tqdm import tqdm
 import networkx as nx
-# from netgraph import Graph
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
 import random
-
-matplotlib.use('Agg')
-
 import numpy as np
-from networkx.generators.community import LFR_benchmark_graph, planted_partition_graph
-
 import torch
 from torch_geometric.nn import Node2Vec
 from torch_geometric.data import Data
-import numpy as np
 
-environ['OMP_NUM_THREADS'] = '48'
+from cdlib.benchmark import LFR, PP
+from networkx.generators.community import LFR_benchmark_graph, planted_partition_graph
+
+matplotlib.use('Agg')
+
+os.environ['OMP_NUM_THREADS'] = '48'
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cuda:1')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 SEED = 42
 
 
@@ -125,12 +117,7 @@ def graph_draw(G, communities, args, idx=None):
             node_size=10, 
             width=0.1,
             with_labels=False)
-    
-    # too slow
-    # Graph(G, node_color=node_colors_dict, node_edge_width=0, edge_alpha=0.1,
-    #       node_layout='community', node_layout_kwargs=dict(node_to_community=communities),
-    #       edge_layout='bundled', 
-    # )
+
 
     if args.graph_type == 'lfr':
         if idx is None:
@@ -213,9 +200,6 @@ def fetch_lfr_graph(args):
         
     return graphs
 
-
-
-
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--graph_type', type=str, default='lfr')
@@ -253,8 +237,6 @@ if __name__ == '__main__':
                     print(f'Error: {e}', flush=True)
                     continue
 
-    # elif args.graph_type == 'lfr' and args.use_downloaded_graph:
-    #     G_list = fetch_lfr_graph(args)
             
     elif args.graph_type == 'pp':
         if args.num_graphs == 1:

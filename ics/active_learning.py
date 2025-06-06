@@ -1,7 +1,6 @@
 import numpy as np
 from torch_geometric.utils import degree
 from scipy.stats import rankdata
-
 from auxiliary.utils import model_eval
 
 epsilon = 1e-12
@@ -15,7 +14,6 @@ def filter_indices(subgraph_pyg):
 
 def random_sampling(selected_indices, incremental_num):
     # randomly select k nodes
-    
     selected_indices = np.random.choice(selected_indices, incremental_num, replace=False)
 
     return selected_indices
@@ -27,9 +25,6 @@ def subgraph_degree_sampling(selected_indices, subgraph_pyg, incremental_num, de
     degrees_in = degree(subgraph_pyg.edge_index[1], subgraph_pyg.num_nodes).to("cpu").detach().numpy()
     degrees = np.sum([degrees_out, degrees_in], axis=0)
     degrees = degrees[selected_indices]
-    # print(degrees)
-    # print(selected_indices)
-    # print(subgraph_pyg.num_nodes)
     
     if deterministic or len(selected_indices) == 1:
         selected_indices = selected_indices[np.argsort(degrees)[-incremental_num:]]
@@ -47,9 +42,6 @@ def global_degree_sampling(selected_indices, subgraph_pyg, original_pyg, increme
     degrees = np.sum([degrees_out, degrees_in], axis=0)
     original_idx = subgraph_pyg.gt_index[selected_indices]
     degrees = degrees[original_idx]
-    # print(degrees)
-    # print(selected_indices)
-    # print(subgraph_pyg.num_nodes)
     
     if deterministic or len(selected_indices) == 1:
         selected_indices = selected_indices[np.argsort(degrees)[-incremental_num:]]
@@ -121,82 +113,37 @@ def aggregated_sampling(selected_indices, uncertainty_scores, ppr_vec,
     entropy_scores[np.isnan(entropy_scores)] = 0
     entropy_scores = entropy_scores[selected_indices]
 
-    # based on the degree of the nodes
-    # degrees_out = degree(original_pyg.edge_index[0], original_pyg.num_nodes).to("cpu").detach().numpy()
-    # degrees_in = degree(original_pyg.edge_index[1], original_pyg.num_nodes).to("cpu").detach().numpy()
-    # degrees = np.sum([degrees_out, degrees_in], axis=0)
-    # original_idx = subgraph_pyg.gt_index[selected_indices]
-    # degrees = degrees[original_idx]
-    # degrees = degrees / np.sum(degrees)
-
-    # based on the ppr scores
-
-    # print(selected_indices)
-    # print(ppr_vec)
-    # print(type(ppr_vec), flush=True)
     original_idx = subgraph_pyg.gt_index[selected_indices]
     ppr_score = ppr_vec[original_idx]
-    # print(ppr_score)
-    
-    # this ppr score is monotonically decreasing. reason: we build the subgraph by the ppr score, and when we get the selected nodes, the node order is preserved.
-    if verbose:
-        # print(f'line 143 in active_learning.py: all PPR: {ppr_vec}')
-        print(f'line 144 in active_learning.py: original idx: {original_idx}')
-        print(f'line 145 in active_learning.py: original PPR: {ppr_score}')
 
     # choose ppr as the topo_score
     topo_score = ppr_score
     # topo_score = degrees
     info_score = entropy_scores
     
-    if verbose:
-        print(f'line 153 in active_learning.py: topo_score: {topo_score}')
-        print(f'line 154 in active_learning.py: info_score: {info_score}')
-    
     # aggregation
 
     if len(selected_indices) == 1:
-        aggregation_scores = 1e10 # 100000000 is a large number, so it will be selected
-        # aggregation_scores = np.log(np.exp(topo_score / (temperature_1 * (current_active_learning_round + 1))) +
-        #                             np.exp(info_score / (temperature_2 * (max_active_learning_round - current_active_learning_round))))
-        # print("topo_score", topo_score)
-        # print("info_score", info_score)
-        # print("aggregation_scores", aggregation_scores)
+        aggregation_scores = 1e10 # a large number, so it will be selected
+
     else:
         if percentile_normalize:
             topo_score = rankdata(topo_score) / len(topo_score)
             info_score = rankdata(info_score) / len(info_score)
         else:
-            topo_mu = np.mean(topo_score)
-            topo_sigma = np.std(topo_score)
 
             if max(topo_score) != min(topo_score):
                 topo_score = (topo_score - min(topo_score)) / (max(topo_score) - min(topo_score) + epsilon)
-            # if topo_sigma < 1:
-            #     topo_score = topo_score
-            # else:
-            #     # topo_score = np.exp(topo_score/ topo_sigma)
-            #     topo_score = (topo_score - topo_mu) / topo_sigma
-
-            info_mu = np.mean(info_score)
-            info_sigma = np.std(info_score)
 
             if max(info_score) != min(info_score):
                 info_score = (info_score - min(info_score)) / (max(info_score) - min(info_score) + epsilon)
-
-            # if info_sigma < 1:
-            #     info_score = info_score
-            # else:
-            #     # info_score = np.exp(info_score / info_sigma)
-            #     info_score = (info_score - info_mu) / info_sigma
             
         if simple_aggregation:
-            # print(f"line 194 in active_learning.py: simple aggregation")
             aggregation_scores = topo_score + info_score
+            
         elif beta_sampled_aggregation:
             a, b = 2, 2 * (max_active_learning_round - current_active_learning_round + 1) / (max_active_learning_round + 1)
             sample = np.random.beta(a, b, size=1)
-            # print(f"line 199 in active_learning.py: alpha: {a}, beta: {b}, sample: {sample}")
             aggregation_scores = topo_score * (1 - sample) + info_score * sample
         else:
 
@@ -205,14 +152,6 @@ def aggregated_sampling(selected_indices, uncertainty_scores, ppr_vec,
                                     np.exp(info_score / (temperature_2 * (max_active_learning_round - current_active_learning_round))))
             else:
                 aggregation_scores = np.log(np.exp(topo_score / temperature_1) + np.exp(info_score / temperature_2))
-    
-    if verbose and len(selected_indices) > 1:
-        print(f'line 210 in active_learning.py: aggregation_scores sort value: {np.sort(aggregation_scores)[-incremental_num:]}')
-        print(f'line 211 in active_learning.py: aggregation_scores sort index: {np.argsort(aggregation_scores)[-incremental_num:]}')
-        print(f'line 212 in active_learning.py: topo_scores sort value: {np.sort(topo_score)[-incremental_num:]}')
-        print(f'line 213 in active_learning.py: topo_scores sort index: {np.argsort(topo_score)[-incremental_num:]}')
-        print(f'line 214 in active_learning.py: info_scores sort value: {np.sort(info_score)[-incremental_num:]}')
-        print(f'line 215 in active_learning.py: info_scores sort index: {np.argsort(info_score)[-incremental_num:]}')
 
 
     if deterministic or sum(aggregation_scores < 0) > 0:
@@ -231,13 +170,9 @@ def active_learning(model, subgraph_pyg, device, method, deterministic, incremen
     selected_indices = filter_indices(subgraph_pyg)
 
     if verbose:
-        print(f'line 234 in active_learning.py: current active learning round: {current_active_learning_round}')
-        print(f'line 235 in active_learning.py: selected_indices: {selected_indices}')
+        print(f'line 173 in active_learning.py: current active learning round: {current_active_learning_round}')
+        print(f'line 174 in active_learning.py: selected_indices: {selected_indices}')
 
-    # if len(selected_indices) == 0:
-    #     if verbose:
-    #         print("No nodes to select from!")
-    #     return [], []
 
     incremental_num = min(incremental_num, len(selected_indices))
 
@@ -267,7 +202,7 @@ def active_learning(model, subgraph_pyg, device, method, deterministic, incremen
         selected_indices = random_sampling(selected_indices, incremental_num)
 
     if verbose:
-        print(f'line 270 in active_learning.py: selected indices: {subgraph_pyg.gt_index[selected_indices]}')
+        print(f'line 205 in active_learning.py: selected indices: {subgraph_pyg.gt_index[selected_indices]}')
 
     pos = [i for i in selected_indices if subgraph_pyg.y[i] == 1]
     neg = [i for i in selected_indices if subgraph_pyg.y[i] == 0]

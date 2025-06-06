@@ -1,39 +1,22 @@
+import os
+import sys
 import warnings
 
 warnings.filterwarnings('ignore')
-
-import os
-from os import environ
-
-environ['OMP_NUM_THREADS'] = '48'
-
-import sys
-
+os.environ['OMP_NUM_THREADS'] = '48'
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import argparse
 from tqdm import tqdm
-import pandas as pd
-import graph_tool.all as gt
 from graph_tool import topology
 import networkx as nx
-# from karateclub import GraRep, Diff2Vec, NodeSketch
 
-import torch
 from torch_geometric.nn import Node2Vec
 from torch_geometric.data import Data
-import numpy as np
-import multiprocessing
-
-# from sklearnex import patch_sklearn
 from auxiliary.utils import *
 
-# patch_sklearn()
-
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
 
 def generate_embeddings_naive(gt_graph, num_features=10):
     num_nodes = gt_graph.num_vertices()
@@ -79,31 +62,6 @@ def generate_embeddings_node2vec(data):
     return model.embedding.weight.data.cpu()
 
 
-# def generate_embeddings_grarep(nx_graph):
-#     model = GraRep(
-#         order=3
-#     )
-#     model.fit(nx_graph)
-
-#     return model.get_embedding()
-
-
-# def generate_embeddings_Diff2Vec(nx_graph):
-#     model = Diff2Vec(
-#         workers=multiprocessing.cpu_count() * 2,
-#         diffusion_number=1
-#     )
-#     model.fit(nx_graph)
-
-#     return model.get_embedding()
-
-
-# def generate_embeddings_NodeSketch(nx_graph):
-#     model = NodeSketch()
-#     model.fit(nx_graph)
-
-#     return model.get_embedding()
-
 
 def gt_to_pyg(gt_graph):
     edge_index = torch.tensor(gt_graph.get_edges()).t().contiguous()
@@ -121,12 +79,6 @@ def add_embeddings(data, graph_gt=None, graph_nx=None, method='node2vec'):
         data.x = generate_embeddings_naive(graph_gt)
     elif method == 'node2vec':
         data.x = generate_embeddings_node2vec(data)
-    # elif method == 'grarep':
-    #     data.x = generate_embeddings_grarep(graph_nx)
-    # elif method == 'diff2vec':
-    #     data.x = generate_embeddings_Diff2Vec(graph_nx)
-    # elif method == 'nodesketch':
-    #     data.x = generate_embeddings_NodeSketch(graph_nx)
     else:
         print('method not supported')
         return

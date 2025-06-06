@@ -1,37 +1,23 @@
+import os
+import sys
 import warnings
 
 warnings.filterwarnings('ignore')
-
-import os
-from os import environ
-
-environ['OMP_NUM_THREADS'] = '48'
-
-import sys
-
+os.environ['OMP_NUM_THREADS'] = '48'
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 import argparse
 from tqdm import tqdm
-import pandas as pd
-import graph_tool.all as gt
 from graph_tool import topology
 import networkx as nx
-# from karateclub import GraRep, Diff2Vec, NodeSketch
-from torch_geometric.utils.convert import from_networkx
 
-import torch
 from torch_geometric.nn import Node2Vec
 from torch_geometric.data import Data
-import numpy as np
-from utils import *
-import multiprocessing
+from auxiliary.utils import *
+from torch_geometric.utils.convert import from_networkx
 
-
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 
 def generate_embeddings_node2vec(data):
     model = Node2Vec(
@@ -79,7 +65,6 @@ def save_graph_pyg(graph_pyg, name):
 
 
 def preprocess(dataset):  
-
     graph_nx = nx.read_gml("../dataset/" + dataset + ".gml", destringizer=int)
     print('graph_nx number of nodes: ', graph_nx.number_of_nodes())
     graph_pyg = from_networkx(graph_nx)
@@ -96,7 +81,8 @@ def preprocess(dataset):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Preprocess the graph data')
-    parser.add_argument('--dataset', type=str, default='dolphins', choices=['dolphins', 'karate', 'eu-core', 'football'],
+    parser.add_argument('--dataset', type=str, default='dolphins', 
+                        choices=['dolphins', 'karate', 'eu-core', 'football'], 
                         help='The dataset to preprocess')
 
     args = parser.parse_args()

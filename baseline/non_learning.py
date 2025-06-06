@@ -1,7 +1,8 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 import os.path as osp
-
 import sys
-
 sys.path.append(osp.dirname(osp.dirname(osp.abspath(__file__))))
 
 from auxiliary.utils import *
@@ -9,8 +10,6 @@ from auxiliary.preprocess_nofeat import *
 from torch_geometric.datasets import Planetoid
 from torch_geometric.utils import to_networkx
 from cdlib import algorithms
-import warnings
-warnings.filterwarnings("ignore")
 
 
 class tradition_CS:
