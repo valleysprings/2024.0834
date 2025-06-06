@@ -24,7 +24,7 @@ os.environ['OMP_NUM_THREADS'] = '48'
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 # Device configuration
-device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 counter = 0 # for simulation
 
 @dataclass
