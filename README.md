@@ -88,18 +88,18 @@ Main pipeline: Using the following script to perform community search for 8 data
 sh exp_comet_main.sh
 ```
 
-**Key Parameters to Adjust in the Main Pipeline:**
-- dataset: Dataset used for evaluation
-- pos_num: Number of positive labels per community at the first round
-- neg_num: Number of negative labels per community at the first round
-- num_queries: Number of CS queries; can exceed the number of communities (sampling with replacement)
-- damping: Damping factor for PPR
-- epsilon: Epsilon for PPR
-- al_method: Active learning method
-- al_round: Number of active learning rounds
-- model: Type of GNN model to use for node classification
-- epochs: Number of training epochs for the GNN model
-- learning_rate: Learning rate for the GNN model (default optimizer: Adam)
-- hidden_layers: Number and size of hidden layers in the GNN model
-- gnn_threshold: Classification threshold for the GNN model
-- seed: Random seed
+**Key Parameters to Adjust:**
+- `dataset`: Dataset used for evaluation
+- `pos_num`: Number of positive labels per community at the first round
+- `neg_num`: Number of negative labels per community at the first round
+- `num_queries`: Number of CS queries; can exceed the number of communities (sampling with replacement)
+- `damping`: Damping factor for PPR
+- `epsilon`: Epsilon for PPR
+- `al_method`: Active learning method
+- `al_round`: Number of active learning rounds
+- `model`: Type of GNN model to use for node classification
+- `epochs`: Number of training epochs for the GNN model
+- `learning_rate`: Learning rate for the GNN model (default optimizer: Adam)
+- `hidden_layers`: Number and size of hidden layers in the GNN model
+- `gnn_threshold`: Classification threshold for the GNN model
+- `seed`: Random seed
