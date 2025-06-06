@@ -34,7 +34,7 @@ To address these challenges, we introduce COMET, a novel interactive framework f
 
 ![Framework](pics/framework.png)
 
-Our objective is to identify query-driven cohesive subgraphs through a multi-round process. We leverage Personalized PageRank with GNN to develop a framework that achieves state-of-the-art performance on most community search benchmarks.
+Our objective is to identify query-driven cohesive subgraphs through a multi-round process. We leverage Personalized PageRank (PPR) with GNN to develop a framework that achieves state-of-the-art performance on most community search benchmarks.
 
 ## Requirements
 
