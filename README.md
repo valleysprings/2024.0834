@@ -56,7 +56,7 @@ Environment:
 The experiments in our paper were conducted on an Ubuntu 22.04 system with two RTX 4090 GPUs (At least one GPU is required). All implementations are done in Python.
 
 
-## code structure
+## Code Structure
 ```
 .
 ├── auxiliary
@@ -71,7 +71,7 @@ The experiments in our paper were conducted on an Ubuntu 22.04 system with two R
 ```
 
 
-## Setup Instructions
+## Setup
 
 - (in dataset folder) Download additional graph datasets (e.g., DBLP, YouTube, LiveJournal) from SNAP (https://snap.stanford.edu/data/index.html#communities). Amazon dataset along with four small datasets (Dolphins, Football, Karate, and EU-core) are already provided in the dataset folder for reference.
 - (in experiments folder) Perform preprocessing (mainly to add Node2vec embedding to each dataset). Four small datasets (Dolphins, Football, Karate, and EU-core) are prepared for reference.
@@ -82,7 +82,7 @@ The experiments in our paper were conducted on an Ubuntu 22.04 system with two R
 
 
 
-## Running Evaluations
+## Evaluations
 
 Main pipeline: Using the following script to perform community search for 8 datasets:
 ```bash
